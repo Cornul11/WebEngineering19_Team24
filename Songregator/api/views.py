@@ -16,17 +16,22 @@ class ArtistsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
 
+        # If name parameter is specified
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(artist_name=name)
 
+        # If genre paratemer is specified
         genre = self.request.query_params.get('genre')
         if genre:
             queryset = queryset.filter(artist_terms=genre)
 
+        # If ordered paratemer is specified
         ordered = self.request.query_params.get('ordered')
         if ordered in ['1', 'true']:
             queryset = queryset.order_by('-artist_hotttnesss')
+
+            # If subset parameter is specified; applicable only if ordered is present.
             subset = self.request.query_params.get('subset')
             if subset and subset.isdigit():
                 queryset = queryset[:int(subset)]
