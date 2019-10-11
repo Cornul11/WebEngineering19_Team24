@@ -4,6 +4,9 @@ from .models import Song
 
 
 class ArtistSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Extracts information about artists.
+    """
     class Meta:
         model = Song
         fields = ('artist_familiarity',
@@ -19,6 +22,10 @@ class ArtistSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SongSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Extracts information about songs.
+    TODO: created for testing purposes. Intended for experiments only.
+    """
     class Meta:
         model = Song
         fields = ('artist_longitude', 'artist_latitude')
