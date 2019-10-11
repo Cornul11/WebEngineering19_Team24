@@ -11,10 +11,23 @@ class ArtistsViewSet(viewsets.ModelViewSet):
     serializer_class = ArtistSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = self.queryset
+
         name = self.request.query_params.get('name')
         if name:
-            return queryset.filter(artist_name=name)
+            queryset = queryset.filter(artist_name=name)
+
+        genre = self.request.query_params.get('genre')
+        if genre:
+            queryset = queryset.filter(artist_terms=genre)
+
+        ordered = self.request.query_params.get('ordered')
+        if ordered in ['1', 'true']:
+            queryset = queryset.order_by('-artist_hotttnesss')
+            subset = self.request.query_params.get('subset')
+            if subset and subset.isdigit():
+                queryset = queryset[:int(subset)]
+
         return queryset
 
 
