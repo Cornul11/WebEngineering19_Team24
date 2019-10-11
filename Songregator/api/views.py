@@ -6,7 +6,7 @@ from .models import Song
 
 # Create your views here.
 
-class ArtistsViewSet(viewsets.ModelViewSet):
+class ArtistViewSet(viewsets.ModelViewSet):
     """
     Generates a view for retrieving information about artists.
     """
