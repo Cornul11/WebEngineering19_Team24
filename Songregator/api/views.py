@@ -7,6 +7,9 @@ from .models import Song
 # Create your views here.
 
 class ArtistsViewSet(viewsets.ModelViewSet):
+    """
+    Generates a view for retrieving information about artists.
+    """
     queryset = Song.objects.all()
     serializer_class = ArtistSerializer
 
