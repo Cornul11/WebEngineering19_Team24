@@ -13,8 +13,10 @@ class Song(models.Model):
     artist_similar = models.FloatField()
     artist_terms = models.CharField(max_length=80)
     artist_terms_freq = models.FloatField()
+
     release_id = models.IntegerField()
     release_name = models.IntegerField()
+
     song_artist_mbtags = models.FloatField()
     song_artist_mbtags_count = models.FloatField()
     song_bars_confidence = models.FloatField()
