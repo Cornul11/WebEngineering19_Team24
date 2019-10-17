@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 
-from common.util.csv_loader import import_csv
 from .models import Song
 from .serializers import SongSerializer, ArtistSerializer
 
@@ -44,9 +42,3 @@ class ArtistViewSet(viewsets.ModelViewSet):
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all().order_by('artist_longitude')
     serializer_class = SongSerializer
-
-
-def song_update(request):
-    if request.method == "GET":
-        import_csv()
-        return render(template_name='index.html', request=request)
