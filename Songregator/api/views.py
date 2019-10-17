@@ -50,9 +50,3 @@ class SongViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         song_id = self.kwargs['song_id']
         return queryset.filter(song_id=song_id)
-
-
-def song_update(request):
-    if request.method == "GET":
-        import_csv()
-        return render(template_name='index.html', request=request)
