@@ -2,7 +2,8 @@ from rest_framework import viewsets
 
 from .serializers import SongSerializer, ArtistSerializer
 from .models import Song
-
+from django.shortcuts import render
+from common.util.csv_loader import import_csv
 
 # Create your views here.
 
@@ -21,12 +22,12 @@ class ArtistViewSet(viewsets.ModelViewSet):
         if name:
             queryset = queryset.filter(artist_name=name)
 
-        # If genre paratemer is specified
+        # If genre parameter is specified
         genre = self.request.query_params.get('genre')
         if genre:
             queryset = queryset.filter(artist_terms=genre)
 
-        # If ordered paratemer is specified
+        # If ordered parameter is specified
         ordered = self.request.query_params.get('ordered')
         if ordered in ['1', 'true']:
             queryset = queryset.order_by('-artist_hotttnesss')
@@ -42,3 +43,9 @@ class ArtistViewSet(viewsets.ModelViewSet):
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all().order_by('artist_longitude')
     serializer_class = SongSerializer
+
+
+def song_update(request):
+    if request.method == "GET":
+        import_csv()
+        return render(template_name='index.html', request=request)

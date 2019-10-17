@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from api.views import song_update
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('api.urls'))
+    path('', include('api.urls')),
+    path('update-csv/', song_update, name='update')
 ]
