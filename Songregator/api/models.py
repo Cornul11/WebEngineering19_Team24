@@ -9,7 +9,7 @@ class Song(models.Model):
     artist_latitude = models.FloatField()
     artist_location = models.IntegerField()
     artist_longitude = models.FloatField()
-    artist_name = models.CharField(max_length=80)
+    artist_name = models.CharField(max_length=270)
     artist_similar = models.FloatField()
     artist_terms = models.CharField(max_length=80)
     artist_terms_freq = models.FloatField()
