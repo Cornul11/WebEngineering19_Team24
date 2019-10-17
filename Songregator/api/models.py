@@ -26,7 +26,7 @@ class Song(models.Model):
     song_duration = models.FloatField()
     song_end_of_fade_in = models.FloatField()
     song_hotttnesss = models.FloatField()
-    song_id = models.CharField(max_length=80)
+    song_id = models.CharField(max_length=80, primary_key=True)
     song_key = models.FloatField()
     song_key_confidence = models.FloatField()
     song_loudness = models.FloatField()

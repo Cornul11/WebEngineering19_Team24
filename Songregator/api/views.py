@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from common.util.csv_loader import import_csv
 from .models import Song
@@ -42,8 +43,14 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
 
 class SongViewSet(viewsets.ModelViewSet):
-    queryset = Song.objects.all().order_by('artist_longitude')
+    queryset = Song.objects.all()
     serializer_class = SongSerializer
+    lookup_field = 'song_id'
+
+    def get_queryset(self):
+        queryset = self.queryset
+        song_id = self.kwargs['song_id']
+        return queryset.filter(song_id=song_id)
 
 
 def song_update(request):
