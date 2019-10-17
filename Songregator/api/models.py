@@ -38,7 +38,7 @@ class Song(models.Model):
     song_tempo = models.FloatField()
     song_time_signature = models.FloatField()
     song_time_signature_confidence = models.FloatField()
-    song_title = models.IntegerField()
+    song_title = models.CharField(max_length=120)
     song_year = models.IntegerField()
 
     def __str__(self):
