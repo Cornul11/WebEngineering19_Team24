@@ -1,8 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from common.util.csv_loader import import_csv
 from .models import Song
 from .serializers import SongSerializer, ArtistSerializer
 
