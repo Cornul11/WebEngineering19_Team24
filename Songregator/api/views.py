@@ -1,9 +1,10 @@
+from django.shortcuts import render
 from rest_framework import viewsets
 
-from .serializers import SongSerializer, ArtistSerializer
-from .models import Song
-from django.shortcuts import render
 from common.util.csv_loader import import_csv
+from .models import Song
+from .serializers import SongSerializer, ArtistSerializer
+
 
 # Create your views here.
 
