@@ -1,4 +1,4 @@
-#/usr/bin
+#!/usr/bin
 
 sudo apt update
 sudo apt upgrade -y python3
