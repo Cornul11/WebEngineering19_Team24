@@ -1,4 +1,6 @@
+from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from .models import Song
 from .serializers import SongSerializer, ArtistSerializer
@@ -40,5 +42,11 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
 
 class SongViewSet(viewsets.ModelViewSet):
-    queryset = Song.objects.all().order_by('artist_longitude')
+    queryset = Song.objects.all()
     serializer_class = SongSerializer
+    lookup_field = 'song_id'
+
+    def get_queryset(self):
+        queryset = self.queryset
+        song_id = self.kwargs['song_id']
+        return queryset.filter(song_id=song_id)

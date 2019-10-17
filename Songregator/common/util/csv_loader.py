@@ -1,13 +1,8 @@
-import sys
-
-from django.core.exceptions import ObjectDoesNotExist
-
 from api.forms import SongForm
-from api.models import Song
 
 
 def import_csv():
-    csv_file_name = 'music.csv'
+    csv_file_name = '../../music.csv'
     with open(csv_file_name, 'r') as csv_file:
         file_data = csv_file.read()
         lines = file_data.split('\n')[1:-1]  # filter the column names and the last empty row
@@ -41,20 +36,4 @@ def import_csv():
                     print(form.errors.as_json())
             except Exception as e:
                 print(repr(e))
-                pass
-
-
-def add_names():
-    song_names_file_name = 'song_names'
-    with open(song_names_file_name, 'r') as song_names_file:
-        file_data = song_names_file.read()
-        lines = file_data.split('\n')[:-1]  # filter the last empty row
-        for line in lines:
-            fields = line.split('<SEP>')
-            try:
-                s = Song.objects.get(song_id=fields[1])
-                s.song_title = fields[3]
-                s.save()
-            except ObjectDoesNotExist:
-                print('no song with id', fields[1], file=sys.stderr)
                 pass

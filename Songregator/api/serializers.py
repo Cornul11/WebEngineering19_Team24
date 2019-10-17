@@ -22,10 +22,28 @@ class ArtistSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SongSerializer(serializers.HyperlinkedModelSerializer):
-    """
-    Extracts information about songs.
-    TODO: created for testing purposes. Intended for experiments only.
-    """
     class Meta:
         model = Song
-        fields = ('artist_longitude', 'artist_latitude')
+        fields = ('song_artist_mbtags',
+                  'song_artist_mbtags_count',
+                  'song_bars_confidence',
+                  'song_bars_start',
+                  'song_beats_confidence',
+                  'song_beats_start',
+                  'song_duration',
+                  'song_end_of_fade_in',
+                  'song_hotttnesss',
+                  'song_id',
+                  'song_key',
+                  'song_key_confidence',
+                  'song_loudness',
+                  'song_mode',
+                  'song_mode_confidence',
+                  'song_start_of_fade_out',
+                  'song_tatums_confidence',
+                  'song_tatums_start',
+                  'song_tempo',
+                  'song_time_signature',
+                  'song_time_signature_confidence',
+                  'song_title',
+                  'song_year')
