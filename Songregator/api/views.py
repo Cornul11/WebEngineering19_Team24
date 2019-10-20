@@ -89,9 +89,8 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
         data = list(queryset.values_list('song_hotttnesss', flat=True))
         if not data:
-            # If queryset is empty, let data contains two zeros, which is enough to make
-            # mean = median = std = 0
-            data = [0, 0]
+            # If queryset is empty, we return an empty dictionary
+            return Response(statistics)
         statistics['mean'] = mean(data)
         statistics['median'] = median(data)
         statistics['std'] = stdev(data)
