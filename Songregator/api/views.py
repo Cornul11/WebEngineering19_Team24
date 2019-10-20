@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.response import Response
+from statistics import mean, median, stdev
 
 from .models import Song
 from .serializers import SongSerializer, ArtistSerializer
@@ -50,3 +51,67 @@ class SongViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
         song_id = self.kwargs['song_id']
         return queryset.filter(song_id=song_id)
+
+
+class SongListViewSet(viewsets.ModelViewSet):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        artist = self.request.query_params.get('artist')
+        if artist:
+            queryset = queryset.filter(artist_name=artist)
+
+        year = self.request.query_params.get('year')
+        if year and year.isdigit():
+            queryset = queryset.filter(song_year=int(year))
+
+        ordered = self.request.query_params.get('ordered')
+        if ordered in ['1', 'true']:
+            queryset = queryset.order_by('-song_hotttnesss')
+
+            subset = self.request.query_params.get('subset')
+            if subset and subset.isdigit():
+                queryset = queryset[:int(subset)]
+
+        return queryset
+
+
+class StatisticsViewSet(viewsets.ModelViewSet):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        statistics = dict()
+
+        data = list(queryset.values_list('song_hotttnesss', flat=True))
+        if not data:
+            # If queryset is empty, let data contains two zeros, which is enough to make
+            # mean = median = std = 0
+            data = [0, 0]
+        statistics['mean'] = mean(data)
+        statistics['median'] = median(data)
+        statistics['std'] = stdev(data)
+
+        return Response(statistics)
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        artist = self.request.query_params.get('artist')
+        if not artist:
+            # Artist is MANDATORY
+            artist = ''
+        queryset = queryset.filter(artist_name=artist)
+        if not artist:
+            # If artist is not provided, return an empty queryset
+            return queryset
+
+        year = self.request.query_params.get('year')
+        if year and year.isdigit():
+            queryset = queryset.filter(song_year=int(year))
+
+        return queryset
