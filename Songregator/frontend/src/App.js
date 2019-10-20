@@ -20,10 +20,10 @@ const BaseLayout = () => (
                 <div className="collapse navbar-collapse" id="navbarResponsive">
                     <ul className="navbar-nav ml-auto">
                         <li className="nav-item active">
-                            <a class="nav-link" href="/">Artists</a>
+                            <a className="nav-link" href="/">Artists</a>
                         </li>
                         <li className="nav-item active">
-                            <a class="nav-link" href="/songs">Songs</a>
+                            <a className="nav-link" href="/songs">Songs</a>
                         </li>
                     </ul>
                 </div>
