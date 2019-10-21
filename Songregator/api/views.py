@@ -119,17 +119,17 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 class DeleteSongsViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
-    lookup_field = 'artist_name'
 
     def destroy(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         deleted_songs = SongSerializer(queryset, many=True).data
-        self.perform_destroy(queryset)
+        for song in queryset:
+            self.perform_destroy(song)
         return Response(deleted_songs)
 
     def get_queryset(self):
         queryset = self.queryset
-        artist = self.kwargs['artist_name']
+        artist = self.request.query_params.get('artist')
         if not artist:
             artist = ''
         return queryset.filter(artist_name=artist)
