@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {BrowserRouter} from "react-router-dom";
-import {Route, Link} from 'react-router-dom';
+import {BrowserRouter, Route} from "react-router-dom";
 import ArtistsList from "./ArtistsList";
 import SongsList from "./SongsList";
 // import logo from './logo.svg';
 import './App.css';
 import SearchBar from "./SongForm";
+import ArtistStats from "./ArtistStats";
 
 
 const BaseLayout = () => (
@@ -28,6 +28,9 @@ const BaseLayout = () => (
                         <li className="nav-item active">
                             <a className="nav-link" href="/songlist">Songs</a>
                         </li>
+                        <li className="nav-item active">
+                            <a className="nav-link" href="/stats">Artist stats</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -38,6 +41,7 @@ const BaseLayout = () => (
                     <Route path="/artists" exact component={ArtistsList}/>
                     <Route path="/songs" exact component={SearchBar}/>
                     <Route path="/songlist" exact component={SongsList}/>
+                    <Route path="/stats" exact component={ArtistStats}/>
                 </div>
             </div>
         </div>
