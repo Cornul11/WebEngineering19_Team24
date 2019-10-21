@@ -1,7 +1,7 @@
-from api.forms import SongForm
+from api.forms import SongForm, ArtistForm
 
 
-def import_csv():
+def import_csv_to_song():
     csv_file_name = '../../music.csv'
     with open(csv_file_name, 'r') as csv_file:
         file_data = csv_file.read()
@@ -30,6 +30,33 @@ def import_csv():
                          'song_title': fields[33], 'song_year': fields[34]}
             try:
                 form = SongForm(song_data)
+                if form.is_valid():
+                    form.save()
+                else:
+                    print(form.errors.as_json())
+            except Exception as e:
+                print(repr(e))
+                pass
+
+
+def import_csv_to_artist():
+    csv_file_name = '../../music.csv'
+    with open(csv_file_name, 'r') as csv_file:
+        file_data = csv_file.read()
+        lines = file_data.split('\n')[1:-1]  # filter the column names and the last empty row
+        for line in lines:
+            fields = line.split(',')
+            for i in range(len(fields)):
+                fields[i] = fields[i].replace('"', '')  # convert isolated values to normal values
+            if fields[8] == '':  # fix dataset missing values in the artist_terms row
+                fields[8] = 'none'
+            artist_data = {'artist_familiarity': float(fields[0]), 'artist_hotttnesss': float(fields[1]),
+                           'artist_id': fields[2], 'artist_latitude': float(fields[3]), 'artist_location': fields[4],
+                           'artist_longitude': float(fields[5]), 'artist_name': fields[6],
+                           'artist_similar': float(fields[7]), 'artist_terms': fields[8],
+                           'artist_terms_freq': float(fields[9])}
+            try:
+                form = ArtistForm(artist_data)
                 if form.is_valid():
                     form.save()
                 else:

@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from statistics import mean, median, stdev
+
 from rest_framework import viewsets
 from rest_framework.response import Response
-from statistics import mean, median, stdev
 
 from .models import Song, Artist
 from .serializers import SongSerializer, ArtistSerializer
