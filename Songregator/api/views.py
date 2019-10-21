@@ -92,8 +92,8 @@ class StatisticsViewSet(viewsets.ModelViewSet):
             # If queryset is empty, we return an empty dictionary
             return Response(statistics)
         statistics['mean'] = mean(data)
-        statistics['median'] = median(data)
-        statistics['std'] = stdev(data)
+        statistics['median'] = median(data) if len(data) > 1 else data[0]
+        statistics['std'] = stdev(data) if len(data) > 1 else data[0]
 
         return Response(statistics)
 
@@ -114,3 +114,19 @@ class StatisticsViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(song_year=int(year))
 
         return queryset
+
+
+class DeleteSongsViewSet(viewsets.ModelViewSet):
+    queryset = Song.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        self.perform_destroy(queryset)
+        return Response
+
+    def get_queryset(self):
+        queryset = self.queryset
+        artist = self.request.query_params.get('artist')
+        if not artist:
+            artist = ''
+        return queryset.filter(artist_name=artist)
