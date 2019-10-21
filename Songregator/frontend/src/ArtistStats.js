@@ -19,6 +19,17 @@ function ErrorMessage(props) {
     );
 }
 
+/**
+ * Checks whether the given object is empty, for example
+ * a json object like {}.
+ * @param obj
+ * @returns {boolean}
+ */
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
+
 class Artist extends Component {
     constructor(props) {
         super(props);
@@ -64,9 +75,10 @@ class Artist extends Component {
             });
     };
 
+
     render() {
         let output;
-        if (this.state.gotData === 'true') {
+        if (this.state.gotData === 'true' && !isEmpty(this.state.fetchArtistStat)) {
             output = <ArtistStatInfo name={this.state.sendName} mean={this.state.fetchArtistStat.mean} median={this.state.fetchArtistStat.median}
                                std={this.state.fetchArtistStat.std}/>;
         } else {
