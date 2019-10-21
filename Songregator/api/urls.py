@@ -7,9 +7,10 @@ router = routers.DefaultRouter()
 router.register(r'song', views.SongViewSet, base_name='song')
 router.register(r'artists', views.ArtistViewSet, base_name='artists')
 router.register(r'popularity', views.StatisticsViewSet)
+router.register(r'songs', views.SongListViewSet)
+router.register(r'songs/delete', views.DeleteSongsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('songs', views.SongListViewSet.as_view({'get': 'list'})),
 ]
