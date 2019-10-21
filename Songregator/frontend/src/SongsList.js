@@ -13,7 +13,7 @@ class SongsList extends Component {
 
     componentDidMount() {
         var self = this;
-        songsService.getSong().then(function (result) {
+        songsService.getSongs().then(function (result) {
             console.log(result);
             self.setState({songs: result})
         });
@@ -27,20 +27,20 @@ class SongsList extends Component {
                     <tr>
                         <th>id</th>
                         <th>Name</th>
-                        <th>Duration</th>
+                        <th>Terms</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {/*{this.state.songs.map(a =>*/}
-                        <tr key={this.state.songs.pk}>
-                            <td>{this.state.songs.song_id}  </td>
-                            <td>{this.state.songs.song_title}</td>
-                            <td>{this.state.songs.song_duration}</td>
+                    {this.state.songs.map(a =>
+                        <tr key={a.pk}>
+                            <td>{a.song_id}  </td>
+                            <td>{a.song_title}</td>
+                            <td>{a.song_duration}</td>
                             {/*<td>*/}
                             {/*    <button onClick={(e) => this.handleDelete(e, a.pk)}> Delete</button>*/}
                             {/*    <a href={"/customer/" + a.pk}> Update</a>*/}
                             {/*</td>*/}
-                        </tr>{/*)*/}
+                        </tr>)}
                     </tbody>
                 </table>
                 {/*<button className="btn btn-primary" onClick={this.nextPage}>Next</button>*/}

@@ -20,10 +20,13 @@ const BaseLayout = () => (
                 <div className="collapse navbar-collapse" id="navbarResponsive">
                     <ul className="navbar-nav ml-auto">
                         <li className="nav-item active">
-                            <a className="nav-link" href="/">Artists</a>
+                            <a className="nav-link" href="/artists">Artists</a>
                         </li>
                         <li className="nav-item active">
-                            <a className="nav-link" href="/songs">Songs</a>
+                            <a className="nav-link" href="/songs">Song info</a>
+                        </li>
+                        <li className="nav-item active">
+                            <a className="nav-link" href="/songlist">Songs</a>
                         </li>
                     </ul>
                 </div>
@@ -32,8 +35,9 @@ const BaseLayout = () => (
         <div className="container">
             <div className="card border-0 shadow my-5">
                 <div className="card-body p-5">
-                    <Route path="/" exact component={ArtistsList}/>
+                    <Route path="/artists" exact component={ArtistsList}/>
                     <Route path="/songs" exact component={SearchBar}/>
+                    <Route path="/songlist" exact component={SongsList}/>
                 </div>
             </div>
         </div>
