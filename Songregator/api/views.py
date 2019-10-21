@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from statistics import mean, median, stdev
 
-from .models import Song
+from .models import Song, Artist
 from .serializers import SongSerializer, ArtistSerializer
 
 
@@ -117,11 +117,13 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
 
 class DeleteSongsViewSet(viewsets.ModelViewSet):
-    queryset = Song.objects.all()
-    serializer_class = SongSerializer
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
+    lookup_field = 'artist_name'
 
     def destroy(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        artist_name = list(self.get_queryset().values_list('artist_name', flat=True))[0]
+        queryset = Song.objects.filter(artist_name=artist_name)
         deleted_songs = SongSerializer(queryset, many=True).data
         for song in queryset:
             self.perform_destroy(song)
@@ -129,7 +131,5 @@ class DeleteSongsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        artist = self.request.query_params.get('artist')
-        if not artist:
-            artist = ''
-        return queryset.filter(artist_name=artist)
+        artist_name = self.kwargs['artist_name']
+        return queryset.filter(artist_name=artist_name)

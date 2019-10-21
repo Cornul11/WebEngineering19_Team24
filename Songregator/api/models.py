@@ -2,6 +2,23 @@ from django.db import models
 
 
 # Create your models here.
+
+class Artist(models.Model):
+    artist_familiarity = models.FloatField()
+    artist_hotttnesss = models.FloatField()
+    artist_id = models.CharField(max_length=80)
+    artist_latitude = models.FloatField()
+    artist_location = models.IntegerField()
+    artist_longitude = models.FloatField()
+    artist_name = models.CharField(max_length=270, unique=True)
+    artist_similar = models.FloatField()
+    artist_terms = models.CharField(max_length=80)
+    artist_terms_freq = models.FloatField()
+
+    def __str__(self):
+        return str(self.artist_name)
+
+
 class Song(models.Model):
     artist_familiarity = models.FloatField()
     artist_hotttnesss = models.FloatField()
