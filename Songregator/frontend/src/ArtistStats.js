@@ -4,12 +4,12 @@ import ArtistStatInfo from "./ArtistStatInfo";
 
 function ErrorMessage(props) {
     let message = '';
-    if (!props.givenError) {
-        return null;
-    }
 
-    if (props.givenError.response.status === 404) {
-        message = 'Artist not found in the database!'
+    //if not an error but empty response (no such artist exists)
+    if (!props.givenError && props.requested === 'true') {
+        message = 'Artist not found in the database!';
+    } else {
+        message = 'There was a problem retrieving artist data!';
     }
 
     return (
@@ -79,10 +79,15 @@ class Artist extends Component {
     render() {
         let output;
         if (this.state.gotData === 'true' && !isEmpty(this.state.fetchArtistStat)) {
-            output = <ArtistStatInfo name={this.state.sendName} mean={this.state.fetchArtistStat.mean} median={this.state.fetchArtistStat.median}
-                               std={this.state.fetchArtistStat.std}/>;
+            output = <ArtistStatInfo name={this.state.sendName} mean={this.state.fetchArtistStat.mean}
+                                     median={this.state.fetchArtistStat.median}
+                                     std={this.state.fetchArtistStat.std}/>;
+        } else if (isEmpty(this.state.fetchArtistStat)) { //if no such artist found
+            output = <ErrorMessage requested={'true'}/>
+        } else if (this.state.error !== '') {
+            output = <ErrorMessage givenError={this.state.error}/> //if the server returned an error
         } else {
-            output = <ErrorMessage givenError={this.state.error}/>
+            output = ''; //show nothing if no request was made yet
         }
         return (
             <div className="container-fluid">
