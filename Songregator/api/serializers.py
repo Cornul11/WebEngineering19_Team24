@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Song
+from .models import Song, Artist
 
 
 class ArtistSerializer(serializers.HyperlinkedModelSerializer):
@@ -8,7 +8,7 @@ class ArtistSerializer(serializers.HyperlinkedModelSerializer):
     Extracts information about artists.
     """
     class Meta:
-        model = Song
+        model = Artist
         fields = ('artist_familiarity',
                   'artist_hotttnesss',
                   'artist_id',
@@ -46,4 +46,5 @@ class SongSerializer(serializers.HyperlinkedModelSerializer):
                   'song_time_signature',
                   'song_time_signature_confidence',
                   'song_title',
-                  'song_year')
+                  'song_year',
+                  'artist_terms')
