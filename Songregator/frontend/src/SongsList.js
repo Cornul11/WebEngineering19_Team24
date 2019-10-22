@@ -27,15 +27,15 @@ class SongsList extends Component {
                     <tr>
                         <th>id</th>
                         <th>Name</th>
-                        <th>Terms</th>
+                        <th>Genre</th>
                     </tr>
                     </thead>
                     <tbody>
                     {this.state.songs.map(a =>
-                        <tr key={a.pk}>
+                        <tr key={a.song_id}>
                             <td>{a.song_id}  </td>
                             <td>{a.song_title}</td>
-                            <td>{a.song_duration}</td>
+                            <td>{a.artist_id}</td>
                             {/*<td>*/}
                             {/*    <button onClick={(e) => this.handleDelete(e, a.pk)}> Delete</button>*/}
                             {/*    <a href={"/customer/" + a.pk}> Update</a>*/}
