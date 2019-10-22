@@ -116,31 +116,6 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class DeleteArtistViewSet(viewsets.ModelViewSet):
-    queryset = Artist.objects.all()
-    serializer_class = ArtistSerializer
-    lookup_field = 'artist_id'
-
-    def destroy(self, request, *args, **kwargs):
-        artist_list = list(self.get_queryset().values_list('artist_id', flat=True))
-        if not artist_list:
-            return Response()
-        artist_id = artist_list[0]
-        song_queryset = Song.objects.filter(artist_id=artist_id)
-        for song in song_queryset:
-            self.perform_destroy(song)
-        artist_queryset = Artist.objects.filter(artist_id=artist_id)
-        deleted_artists = ArtistSerializer(artist_queryset, many=True).data
-        for artist in artist_queryset:
-            self.perform_destroy(artist)
-        return Response(deleted_artists)
-
-    def get_queryset(self):
-        queryset = self.queryset
-        artist_id = self.kwargs['artist_id']
-        return queryset.filter(artist_id=artist_id)
-
-
 class DeleteSongsViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
