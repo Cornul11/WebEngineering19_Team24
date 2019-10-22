@@ -17,7 +17,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class = ArtistSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Artist.objects.all()
 
         # If name parameter is specified
         name = self.request.query_params.get('name')
@@ -48,7 +48,7 @@ class SongViewSet(viewsets.ModelViewSet):
     lookup_field = 'song_id'
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Song.objects.all()
         song_id = self.kwargs['song_id']
         return queryset.filter(song_id=song_id)
 
@@ -58,7 +58,7 @@ class SongListViewSet(viewsets.ModelViewSet):
     serializer_class = SongSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Song.objects.all()
 
         artist = self.request.query_params.get('artist')
         if artist:
@@ -98,7 +98,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         return Response(statistics)
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Song.objects.all()
 
         artist = self.request.query_params.get('artist')
         if not artist:
@@ -137,6 +137,6 @@ class DeleteSongsViewSet(viewsets.ModelViewSet):
         return Response(deleted_songs)
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Artist.objects.all()
         artist_name = self.kwargs['artist_name']
         return queryset.filter(artist_name=artist_name)
