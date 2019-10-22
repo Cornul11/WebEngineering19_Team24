@@ -147,14 +147,18 @@ class DeleteSongsViewSet(viewsets.ModelViewSet):
     lookup_field = 'artist_name'
 
     def destroy(self, request, *args, **kwargs):
-        artist_list = list(self.get_queryset().values_list('artist_name', flat=True))
+        artist_queryset = self.get_queryset()
+        artist_list = list(artist_queryset.values_list('artist_name', flat=True))
         if not artist_list:
             return Response()
         artist_name = artist_list[0]
-        queryset = Song.objects.filter(artist_name=artist_name)
-        deleted_songs = SongSerializer(queryset, many=True).data
-        for song in queryset:
+        song_queryset = Song.objects.filter(artist_name=artist_name)
+        deleted_songs = SongSerializer(song_queryset, many=True).data
+        for song in song_queryset:
             self.perform_destroy(song)
+        for artist in artist_queryset:
+            # Although there is only one artist, iteration allows to access it without any problems.
+            self.perform_destroy(artist)
         return Response(deleted_songs)
 
     def get_queryset(self):
