@@ -19,10 +19,40 @@ class ArtistViewSet(viewsets.ModelViewSet):
     serializer_class = ArtistSerializer
     lookup_field = 'artist_name'
 
-    def artist_list(self):
-        return self.get_queryset()
+    def create(self, request, *args, **kwargs):
+        """
+        Create artist based on request parameters. All fields should be present in the request.
+        :param request: Request containing all parameters.
+        :return: Response with information about created artist
+        """
+        params = self.parse_params(request)
+        if not params:
+            return Response({'ERROR': 'One of the fields is missing or of an incorrect type'})
+
+        if len(Artist.objects.filter(artist_name=params['artist_name'])) > 0:
+            return Response({'ERROR': 'Artist with the same name already exists.'})
+
+        artist = Artist.objects.create(
+            artist_familiarity=params['artist_familiarity'],
+            artist_hotttnesss=params['artist_hotttnesss'],
+            artist_id=params['artist_id'],
+            artist_latitude=params['artist_latitude'],
+            artist_location=params['artist_location'],
+            artist_longitude=params['artist_longitude'],
+            artist_name=params['artist_name'],
+            artist_similar=params['artist_similar'],
+            artist_terms=params['artist_terms'],
+            artist_terms_freq=params['artist_terms_freq']
+        )
+
+        return Response(ArtistSerializer(artist).data)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Update longitude and latitude of selected artist.
+        :param request: Request that contains longitude and latitude
+        :return: Response with name and new longitude and latitude of artist
+        """
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
         if isfloat(longitude) and isfloat(latitude):
@@ -64,6 +94,30 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @staticmethod
+    def parse_params(request):
+        """
+        Validate and parse all parameters for creating a new Artist.
+        :param request: Request containing required query parameters.
+        :return: Dictionary with parsed parameters
+        """
+        try:
+            params = {
+                'artist_familiarity': float(request.query_params.get('familiarity')),
+                'artist_hotttnesss': float(request.query_params.get('hotttnesss')),
+                'artist_id': request.query_params.get('id'),
+                'artist_latitude': float(request.query_params.get('latitude')),
+                'artist_location': int(request.query_params.get('location')),
+                'artist_longitude': float(request.query_params.get('longitude')),
+                'artist_name': request.query_params.get('name'),
+                'artist_similar': float(request.query_params.get('similar')),
+                'artist_terms': request.query_params.get('terms'),
+                'artist_terms_freq': float(request.query_params.get('terms_freq'))
+            }
+            return params
+        except ValueError:
+            return dict()
+
 
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
@@ -74,6 +128,27 @@ class SongViewSet(viewsets.ModelViewSet):
         queryset = Song.objects.all()
         song_id = self.kwargs['song_id']
         return queryset.filter(song_id=song_id)
+
+    def list(self, request, *args, **kwargs):
+        queryset = Song.objects.all()
+
+        artist = self.request.query_params.get('artist')
+        if artist:
+            queryset = queryset.filter(artist_name=artist)
+
+        year = self.request.query_params.get('year')
+        if year and year.isdigit():
+            queryset = queryset.filter(song_year=int(year))
+
+        ordered = self.request.query_params.get('ordered')
+        if ordered in ['1', 'true']:
+            queryset = queryset.order_by('-song_hotttnesss')
+
+            subset = self.request.query_params.get('subset')
+            if subset and subset.isdigit():
+                queryset = queryset[:int(subset)]
+
+        return queryset
 
 
 class SongListViewSet(viewsets.ModelViewSet):
@@ -139,7 +214,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class DeleteSongsViewSet(viewsets.ModelViewSet):
+class ArtistDeleteViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
     lookup_field = 'artist_name'
