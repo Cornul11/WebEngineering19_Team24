@@ -1,4 +1,4 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
 import ArtistsService from "./ArtistsService";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -13,10 +13,12 @@ class ArtistsList extends Component {
             nextPageURL: '',
             previousPageURL: '',
             showPopup: false,
+            artistToEdit: '',
         };
         this.nextPage = this.nextPage.bind(this);
         this.previousPage = this.previousPage.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.togglePopup = this.togglePopup.bind(this)
     }
 
     componentDidMount() {
@@ -51,10 +53,12 @@ class ArtistsList extends Component {
         })
     }
 
-    togglePopup() {
-        this.setState({
-            showPopup: !this.state.showPopup
-        });
+    togglePopup(d, e) {
+        this.setState(state => ({
+            showPopup: !state.showPopup,
+            artistToEdit: d
+        }));
+        console.log(d);
     }
 
     render() {
@@ -64,7 +68,6 @@ class ArtistsList extends Component {
 
         return (
             <div>
-                <button onClick={this.togglePopup.bind(this)}> Click To Launch Popup</button>
                 <p>Debug: {this.state.artists.length} items</p>
                 <h1 className="font-weight-light">Artists list</h1>
                 <table className="table table-striped table-hover">
@@ -92,14 +95,9 @@ class ArtistsList extends Component {
                                         {" "}
                                         Delete
                                     </button>
-                                    <a
-                                        role="button"
-                                        className="btn btn-secondary btn-sm"
-                                        onClick={null}
-                                    >
-                                        {" "}
-                                        Update
-                                    </a>
+                                    <button type="button" className="btn btn-secondary btn-sm"
+                                            onClick={(e) => this.togglePopup(a.artist_name, e)}>Update
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -126,7 +124,9 @@ class ArtistsList extends Component {
                         <Modal.Title id="contained-modal-title-vcenter">Edit artist?</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {this.state.artists.map(a => (
+                        {this.state.artists.filter((artist) => { // filter first for friends
+                            return artist.artist_name === this.state.artistToEdit // returns a new array
+                        }).map(a => (
                             <p key={a.artist_id}>{a.artist_name}</p>
                         ))}
                     </Modal.Body>
