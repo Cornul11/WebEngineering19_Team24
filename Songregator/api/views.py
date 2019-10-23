@@ -3,6 +3,8 @@ from statistics import mean, median, stdev
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from common.util.helpers import isfloat
+
 from .models import Song, Artist
 from .serializers import SongSerializer, ArtistSerializer
 
@@ -15,6 +17,27 @@ class ArtistViewSet(viewsets.ModelViewSet):
     """
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
+    lookup_field = 'artist_name'
+
+    def artist_list(self):
+        return self.get_queryset()
+
+    def partial_update(self, request, *args, **kwargs):
+        longitude = request.query_params.get('longitude')
+        latitude = request.query_params.get('latitude')
+        if isfloat(longitude) and isfloat(latitude):
+            artist_name = self.kwargs['artist_name']
+            artist = Artist.objects.filter(artist_name=artist_name)
+
+            artist.update(artist_longitude=longitude)
+            artist.update(artist_latitude=latitude)
+
+            updated_data = dict()
+            updated_data['artist_name'] = artist_name
+            updated_data['artist_longitude'] = longitude
+            updated_data['artist_latitude'] = latitude
+            return Response(updated_data)
+        return Response({"detail": "Both new longitude and latitude should be passed."})
 
     def get_queryset(self):
         queryset = Artist.objects.all()
