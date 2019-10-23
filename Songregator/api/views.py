@@ -22,12 +22,12 @@ class ArtistViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         """
         Create artist based on request parameters. All fields should be present in the request.
-        :param request: Request containing all parameters.
+        :param request: CREATE request containing all parameters.
         :return: Response with information about created artist
         """
         params = self.parse_params(request)
-        if not params:
-            return Response({'ERROR': 'One of the fields is missing or of an incorrect type'})
+        if not params['artist_name']:
+            return Response({'ERROR': 'You should provide at least a name of an artist.'})
 
         if len(Artist.objects.filter(artist_name=params['artist_name'])) > 0:
             return Response({'ERROR': 'Artist with the same name already exists.'})
@@ -50,7 +50,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         """
         Update longitude and latitude of selected artist.
-        :param request: Request that contains longitude and latitude
+        :param request: PATCH request that contains longitude and latitude
         :return: Response with name and new longitude and latitude of artist
         """
         longitude = request.query_params.get('longitude')
@@ -70,6 +70,11 @@ class ArtistViewSet(viewsets.ModelViewSet):
         return Response({"detail": "Both new longitude and latitude should be passed."})
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete artist by his/her name and all his/her songs.
+        :param request: DELETE request with artist's name
+        :return: List of deleted songs
+        """
         artist_name = self.kwargs['artist_name']
         artist = Artist.objects.get(artist_name=artist_name)
         song_queryset = Song.objects.filter(artist_name=artist_name)
@@ -104,29 +109,54 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @staticmethod
-    def parse_params(request):
+    def parse_params(self, request):
         """
         Validate and parse all parameters for creating a new Artist.
-        :param request: Request containing required query parameters.
+        :param request: CREATE request containing required query parameters.
         :return: Dictionary with parsed parameters
         """
+        params = dict()
+
+        self.validate_param(request, params, 'artist_familiarity', 'float')
+        self.validate_param(request, params, 'artist_hotttnesss', 'float')
+        self.validate_param(request, params, 'artist_id', 'str')
+        self.validate_param(request, params, 'artist_latitude', 'float')
+        self.validate_param(request, params, 'artist_location', 'int')
+        self.validate_param(request, params, 'artist_longitude', 'float')
+        self.validate_param(request, params, 'artist_name', 'str')
+        self.validate_param(request, params, 'artist_similar', 'float')
+        self.validate_param(request, params, 'artist_terms', 'str')
+        self.validate_param(request, params, 'artist_terms_freq', 'float')
+
+        return params
+
+    @staticmethod
+    def validate_param(request, params, param_name, param_type):
+        """
+        Validate parameters.
+        If success, then assign a parameter to a corresponding key.
+        If failure, then assign default value to a key (0 for int, 0.0 for float, "" for str).
+        :param request:
+        :param params:
+        :param param_name:
+        :param param_type:
+        :return:
+        """
+        param = request.query_params.get(param_name[7:])  # skip "artist_"
         try:
-            params = {
-                'artist_familiarity': float(request.query_params.get('familiarity')),
-                'artist_hotttnesss': float(request.query_params.get('hotttnesss')),
-                'artist_id': request.query_params.get('id'),
-                'artist_latitude': float(request.query_params.get('latitude')),
-                'artist_location': int(request.query_params.get('location')),
-                'artist_longitude': float(request.query_params.get('longitude')),
-                'artist_name': request.query_params.get('name'),
-                'artist_similar': float(request.query_params.get('similar')),
-                'artist_terms': request.query_params.get('terms'),
-                'artist_terms_freq': float(request.query_params.get('terms_freq'))
-            }
-            return params
-        except ValueError:
-            return dict()
+            if param_type == 'str':
+                params[param_name] = "" if not param else param
+            elif param_type == 'float':
+                params[param_name] = float(param)
+            else:
+                params[param_name] = int(param)
+        except (ValueError, TypeError):
+            if param_type == 'str':
+                params[param_name] = ""
+            elif param_type == 'float':
+                params[param_name] = 0.0
+            else:
+                params[param_name] = 0
 
 
 class SongViewSet(viewsets.ModelViewSet):
@@ -191,29 +221,3 @@ class StatisticsViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(song_year=int(year))
 
         return queryset
-
-
-# class ArtistDeleteViewSet(viewsets.ModelViewSet):
-#     queryset = Artist.objects.all()
-#     serializer_class = ArtistSerializer
-#     lookup_field = 'artist_name'
-#
-#     def destroy(self, request, *args, **kwargs):
-#         artist_queryset = self.get_queryset()
-#         artist_list = list(artist_queryset.values_list('artist_name', flat=True))
-#         if not artist_list:
-#             return Response()
-#         artist_name = artist_list[0]
-#         song_queryset = Song.objects.filter(artist_name=artist_name)
-#         deleted_songs = SongSerializer(song_queryset, many=True).data
-#         for song in song_queryset:
-#             self.perform_destroy(song)
-#         for artist in artist_queryset:
-#             # Although there is only one artist, iteration allows to access it without any problems.
-#             self.perform_destroy(artist)
-#         return Response(deleted_songs)
-#
-#     def get_queryset(self):
-#         queryset = Artist.objects.all()
-#         artist_name = self.kwargs['artist_name']
-#         return queryset.filter(artist_name=artist_name)
