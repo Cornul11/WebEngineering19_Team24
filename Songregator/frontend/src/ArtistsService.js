@@ -3,7 +3,13 @@ const API_URL = "http://localhost:8000";
 
 export default class ArtistsService {
   getArtists() {
-    const url = `${API_URL}/artists?timestamp=${new Date().getTime()}`;
+      const url = `${API_URL}/artists?timestamp=${new Date().getTime()}`;
+      return axios.get(url).then(response => response.data);
+  }
+
+  getArtistsByURL(link) {
+    const url = `${link}`;
+    console.log('opening', url);
     return axios.get(url).then(response => response.data);
   }
 
