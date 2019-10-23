@@ -12,6 +12,7 @@ class ArtistsList extends Component {
             artists: [],
             nextPageURL: '',
             previousPageURL: '',
+            showPopup: false,
         };
         this.nextPage = this.nextPage.bind(this);
         this.previousPage = this.previousPage.bind(this);
@@ -50,13 +51,20 @@ class ArtistsList extends Component {
         })
     }
 
+    togglePopup() {
+        this.setState({
+            showPopup: !this.state.showPopup
+        });
+    }
+
     render() {
         let tdStyle = {width: "15%"};
         let previousButtonState = this.state.previousPageURL === null;
-        console.log(this.state.previousPageURL);
+
+
         return (
             <div>
-                <PopupEditingWindow artists={this.state.artists}/>
+                <button onClick={this.togglePopup.bind(this)}> Click To Launch Popup</button>
                 <p>Debug: {this.state.artists.length} items</p>
                 <h1 className="font-weight-light">Artists list</h1>
                 <table className="table table-striped table-hover">
@@ -87,7 +95,7 @@ class ArtistsList extends Component {
                                     <a
                                         role="button"
                                         className="btn btn-secondary btn-sm"
-                                        href={"/customer/" + a.pk}
+                                        onClick={null}
                                     >
                                         {" "}
                                         Update
@@ -98,54 +106,42 @@ class ArtistsList extends Component {
                     ))}
                     </tbody>
                 </table>
-              <div className="d-flex justify-content-center">
-                <button className="mr-2 btn btn-primary" onClick={this.previousPage}
-                        disabled={previousButtonState}>Previous
-                </button>
+                <div className="d-flex justify-content-center">
+                    <button className="mr-2 btn btn-primary" onClick={this.previousPage}
+                            disabled={previousButtonState}>Previous
+                    </button>
 
-                <button className="btn btn-primary" onClick={this.nextPage}>Next</button>
-              </div>
+                    <button className="btn btn-primary" onClick={this.nextPage}>Next</button>
+                </div>
+                {/*<Button variant="primary" onClick={handleShow}>*/}
+                {/*    Open testing popup*/}
+                {/*</Button>*/}
+                <Modal
+                    show={this.state.showPopup}
+                    onHide={this.togglePopup.bind(this)}
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title id="contained-modal-title-vcenter">Edit artist?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {this.state.artists.map(a => (
+                            <p key={a.artist_id}>{a.artist_name}</p>
+                        ))}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={this.togglePopup.bind(this)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={this.closePopup}>
+                            Save changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }
-}
-
-function PopupEditingWindow(props) {
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
-    return (
-        <>
-            <Button variant="primary" onClick={handleShow}>
-                Open testing popup
-            </Button>
-            <Modal
-                show={show}
-                onHide={handleClose}
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">Edit artist?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {props.artists.map(a => (
-                        <p>{a.artist_name}</p>
-                    ))}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
-    );
 }
 
 export default ArtistsList;

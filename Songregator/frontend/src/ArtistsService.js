@@ -9,7 +9,6 @@ export default class ArtistsService {
 
   getArtistsByURL(link) {
     const url = `${link}`;
-    console.log('opening', url);
     return axios.get(url).then(response => response.data);
   }
 
