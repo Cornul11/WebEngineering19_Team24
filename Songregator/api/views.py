@@ -69,6 +69,16 @@ class ArtistViewSet(viewsets.ModelViewSet):
             return Response(updated_data)
         return Response({"detail": "Both new longitude and latitude should be passed."})
 
+    def destroy(self, request, *args, **kwargs):
+        artist_name = self.kwargs['artist_name']
+        artist = Artist.objects.get(artist_name=artist_name)
+        song_queryset = Song.objects.filter(artist_name=artist_name)
+        deleted_songs = SongSerializer(song_queryset, many=True).data
+        for song in song_queryset:
+            self.perform_destroy(song)
+        self.perform_destroy(artist)
+        return Response(deleted_songs)
+
     def get_queryset(self):
         queryset = Artist.objects.all()
 
@@ -123,37 +133,6 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
     lookup_field = 'song_id'
-
-    def get_queryset(self):
-        queryset = Song.objects.all()
-        song_id = self.kwargs['song_id']
-        return queryset.filter(song_id=song_id)
-
-    def list(self, request, *args, **kwargs):
-        queryset = Song.objects.all()
-
-        artist = self.request.query_params.get('artist')
-        if artist:
-            queryset = queryset.filter(artist_name=artist)
-
-        year = self.request.query_params.get('year')
-        if year and year.isdigit():
-            queryset = queryset.filter(song_year=int(year))
-
-        ordered = self.request.query_params.get('ordered')
-        if ordered in ['1', 'true']:
-            queryset = queryset.order_by('-song_hotttnesss')
-
-            subset = self.request.query_params.get('subset')
-            if subset and subset.isdigit():
-                queryset = queryset[:int(subset)]
-
-        return queryset
-
-
-class SongListViewSet(viewsets.ModelViewSet):
-    queryset = Song.objects.all()
-    serializer_class = SongSerializer
 
     def get_queryset(self):
         queryset = Song.objects.all()
@@ -214,27 +193,27 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class ArtistDeleteViewSet(viewsets.ModelViewSet):
-    queryset = Artist.objects.all()
-    serializer_class = ArtistSerializer
-    lookup_field = 'artist_name'
-
-    def destroy(self, request, *args, **kwargs):
-        artist_queryset = self.get_queryset()
-        artist_list = list(artist_queryset.values_list('artist_name', flat=True))
-        if not artist_list:
-            return Response()
-        artist_name = artist_list[0]
-        song_queryset = Song.objects.filter(artist_name=artist_name)
-        deleted_songs = SongSerializer(song_queryset, many=True).data
-        for song in song_queryset:
-            self.perform_destroy(song)
-        for artist in artist_queryset:
-            # Although there is only one artist, iteration allows to access it without any problems.
-            self.perform_destroy(artist)
-        return Response(deleted_songs)
-
-    def get_queryset(self):
-        queryset = Artist.objects.all()
-        artist_name = self.kwargs['artist_name']
-        return queryset.filter(artist_name=artist_name)
+# class ArtistDeleteViewSet(viewsets.ModelViewSet):
+#     queryset = Artist.objects.all()
+#     serializer_class = ArtistSerializer
+#     lookup_field = 'artist_name'
+#
+#     def destroy(self, request, *args, **kwargs):
+#         artist_queryset = self.get_queryset()
+#         artist_list = list(artist_queryset.values_list('artist_name', flat=True))
+#         if not artist_list:
+#             return Response()
+#         artist_name = artist_list[0]
+#         song_queryset = Song.objects.filter(artist_name=artist_name)
+#         deleted_songs = SongSerializer(song_queryset, many=True).data
+#         for song in song_queryset:
+#             self.perform_destroy(song)
+#         for artist in artist_queryset:
+#             # Although there is only one artist, iteration allows to access it without any problems.
+#             self.perform_destroy(artist)
+#         return Response(deleted_songs)
+#
+#     def get_queryset(self):
+#         queryset = Artist.objects.all()
+#         artist_name = self.kwargs['artist_name']
+#         return queryset.filter(artist_name=artist_name)
