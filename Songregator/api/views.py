@@ -2,7 +2,7 @@ from statistics import mean, median, stdev
 
 from django.http import JsonResponse
 from rest_framework import viewsets
-from rest_framework.renderers import JSONRenderer
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
 from rest_framework_csv.renderers import CSVRenderer
 
@@ -21,7 +21,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
     lookup_field = 'artist_name'
-    renderer_classes = [JSONRenderer, CSVRenderer]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
 
     def create(self, request, *args, **kwargs):
         """
@@ -167,7 +167,7 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
     lookup_field = 'song_id'
-    renderer_classes = [JSONRenderer, CSVRenderer]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
 
     def get_queryset(self):
         queryset = Song.objects.all()
@@ -194,7 +194,7 @@ class SongViewSet(viewsets.ModelViewSet):
 class StatisticsViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
-    renderer_classes = [JSONRenderer, CSVRenderer]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
