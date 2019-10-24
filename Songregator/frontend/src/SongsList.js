@@ -22,8 +22,9 @@ class SongsList extends Component {
   render() {
     return (
       <div className="customers--list">
+        <h1 className="font-weight-light">Songs list</h1>
         <table className="table">
-          <thead key="thead">
+          <thead className="thead-dark" key="thead">
             <tr>
               <th>id</th>
               <th>Name</th>
@@ -35,7 +36,7 @@ class SongsList extends Component {
               <tr key={a.song_id}>
                 <td>{a.song_id} </td>
                 <td>{a.song_title}</td>
-                <td>{a.artist_id}</td>
+                <td>{a.artist_terms}</td>
                 {/*<td>*/}
                 {/*    <button onClick={(e) => this.handleDelete(e, a.pk)}> Delete</button>*/}
                 {/*    <a href={"/customer/" + a.pk}> Update</a>*/}
