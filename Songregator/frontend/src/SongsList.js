@@ -15,7 +15,7 @@ class SongsList extends Component {
     let self = this;
     songsService.getSongs().then(function(result) {
       console.log(result);
-      self.setState({songs: result});
+      self.setState({songs: result.results});
     });
   }
 
