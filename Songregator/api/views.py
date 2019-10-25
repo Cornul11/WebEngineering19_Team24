@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from statistics import mean, median, stdev
 
 from rest_framework import viewsets, status
@@ -84,13 +86,16 @@ class ArtistViewSet(viewsets.ModelViewSet):
         :return: List of deleted songs
         """
         artist_name = self.kwargs['artist_name']
-        artist = Artist.objects.get(artist_name=artist_name)
-        song_queryset = Song.objects.filter(artist_name=artist_name)
-        deleted_songs = SongSerializer(song_queryset, many=True).data
-        for song in song_queryset:
-            self.perform_destroy(song)
-        self.perform_destroy(artist)
-        return Response(deleted_songs)
+        try:
+            artist = Artist.objects.get(artist_name=artist_name)
+            song_queryset = Song.objects.filter(artist_name=artist_name)
+            deleted_songs = SongSerializer(song_queryset, many=True).data
+            for song in song_queryset:
+                self.perform_destroy(song)
+            self.perform_destroy(artist)
+            return Response(deleted_songs)
+        except ObjectDoesNotExist:
+            return Response({'ERROR': 'Artist does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     def get_queryset(self):
         queryset = Artist.objects.all()
@@ -221,7 +226,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
         data = list(queryset.values_list('song_hotttnesss', flat=True))
         if not data:
-            return Response({'ERROR': 'You should specify a user'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'ERROR': 'Artist is not specified or does not exist'}, status=status.HTTP_404_NOT_FOUND)
         statistics['mean'] = mean(data)
         statistics['median'] = median(data) if len(data) > 1 else data[0]
         statistics['std'] = stdev(data) if len(data) > 1 else data[0]
