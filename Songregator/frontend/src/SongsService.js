@@ -6,4 +6,9 @@ export default class SongsService {
     const url = `${API_URL}/songs`;
     return axios.get(url).then(response => response.data);
   }
+
+  getSongsByURL(link) {
+    const url = `${link}`;
+    return axios.get(url).then(response => response.data);
+  }
 }
