@@ -1,6 +1,5 @@
 from statistics import mean, median, stdev
 
-from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.response import Response
@@ -21,7 +20,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
     queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
     lookup_field = 'artist_name'
-    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
+    renderer_classes = [JSONRenderer, CSVRenderer]
 
     def create(self, request, *args, **kwargs):
         """
@@ -57,21 +56,23 @@ class ArtistViewSet(viewsets.ModelViewSet):
         :param request: PATCH request that contains longitude and latitude
         :return: Response with name and new longitude and latitude of artist
         """
+        artist_name = self.kwargs['artist_name']
+        artist = Artist.objects.get(artist_name=artist_name)
+
         longitude = request.query_params.get('longitude')
         latitude = request.query_params.get('latitude')
         if isfloat(longitude) and isfloat(latitude):
-            artist_name = self.kwargs['artist_name']
-            artist = Artist.objects.filter(artist_name=artist_name)
-
-            artist.update(artist_longitude=longitude)
-            artist.update(artist_latitude=latitude)
-
-            updated_data = dict()
-            updated_data['artist_name'] = artist_name
-            updated_data['artist_longitude'] = longitude
-            updated_data['artist_latitude'] = latitude
-            return Response(updated_data)
-        return Response({"detail": "Both new longitude and latitude should be passed."})
+            artist.artist_longitude = longitude
+            artist.artist_latitude = latitude
+            artist.save()
+        else:
+            longitude = artist.artist_longitude
+            latitude = artist.artist_latitude
+        updated_data = dict()
+        updated_data['artist_name'] = artist_name
+        updated_data['artist_longitude'] = float(longitude)
+        updated_data['artist_latitude'] = float(latitude)
+        return Response(updated_data)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -167,7 +168,7 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
     lookup_field = 'song_id'
-    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
+    renderer_classes = [JSONRenderer, CSVRenderer]
 
     def get_queryset(self):
         queryset = Song.objects.all()
