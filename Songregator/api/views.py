@@ -1,8 +1,9 @@
 from statistics import mean, median, stdev
 
-from rest_framework import viewsets
-from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework import viewsets, status
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
+
 from rest_framework_csv.renderers import CSVRenderer
 
 from common.util.helpers import isfloat
@@ -10,8 +11,6 @@ from common.util.helpers import isfloat
 from .models import Song, Artist
 from .serializers import SongSerializer, ArtistSerializer
 
-
-# Create your views here.
 
 class ArtistViewSet(viewsets.ModelViewSet):
     """
@@ -30,10 +29,12 @@ class ArtistViewSet(viewsets.ModelViewSet):
         """
         params = self.parse_params(request)
         if not params['artist_name']:
-            return Response({'ERROR': 'You should provide at least a name of an artist.'})
+            return Response({'ERROR': 'You should provide at least a name of an artist.'},
+                            status=status.HTTP_403_FORBIDDEN)
 
         if len(Artist.objects.filter(artist_name=params['artist_name'])) > 0:
-            return Response({'ERROR': 'Artist with the same name already exists.'})
+            return Response({'ERROR': 'Artist with the same name already exists.'},
+                            status=status.HTTP_403_FORBIDDEN)
 
         artist = Artist.objects.create(
             artist_familiarity=params['artist_familiarity'],
@@ -48,7 +49,7 @@ class ArtistViewSet(viewsets.ModelViewSet):
             artist_terms_freq=params['artist_terms_freq']
         )
 
-        return Response(ArtistSerializer(artist).data)
+        return Response(ArtistSerializer(artist).data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         """
@@ -72,7 +73,8 @@ class ArtistViewSet(viewsets.ModelViewSet):
         updated_data['artist_name'] = artist_name
         updated_data['artist_longitude'] = float(longitude)
         updated_data['artist_latitude'] = float(latitude)
-        return Response(updated_data)
+        updated_data['links'] = [{'artist': 'GET /artists/{}/'.format(artist_name)}]
+        return Response(updated_data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -195,7 +197,7 @@ class SongViewSet(viewsets.ModelViewSet):
 class StatisticsViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
-    renderer_classes = [BrowsableAPIRenderer, JSONRenderer, CSVRenderer]
+    renderer_classes = [JSONRenderer, CSVRenderer]
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -203,12 +205,11 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
         data = list(queryset.values_list('song_hotttnesss', flat=True))
         if not data:
-            # If queryset is empty, we return an empty dictionary
-            return Response(statistics)
+            return Response({'ERROR': 'You should specify a user'}, status=status.HTTP_404_NOT_FOUND)
         statistics['mean'] = mean(data)
         statistics['median'] = median(data) if len(data) > 1 else data[0]
         statistics['std'] = stdev(data) if len(data) > 1 else data[0]
-
+        statistics['links'] = [{'artist': 'GET /artists/{}'.format(self.request.query_params.get('artist'))}]
         return Response(statistics)
 
     def get_queryset(self):
