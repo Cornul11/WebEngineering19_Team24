@@ -55,7 +55,8 @@ class ArtistViewSet(viewsets.ModelViewSet):
         """
         Update longitude and latitude of selected artist.
         :param request: PATCH request that contains longitude and latitude
-        :return: Response with name and new longitude and latitude of artist
+        :return: Response with name and new longitude and latitude of artist and
+        a link with a request to obtain information about the artist
         """
         artist_name = self.kwargs['artist_name']
         artist = Artist.objects.get(artist_name=artist_name)
@@ -167,12 +168,19 @@ class ArtistViewSet(viewsets.ModelViewSet):
 
 
 class SongViewSet(viewsets.ModelViewSet):
+    """
+    Generates a view for retrieving information about songs.
+    """
     queryset = Song.objects.all()
     serializer_class = SongSerializer
     lookup_field = 'song_id'
     renderer_classes = [JSONRenderer, CSVRenderer]
 
     def get_queryset(self):
+        """
+        Returns a queryset of songs sorted by artist/year and/or ordered by popularity.
+        :return: Filtered and sorted queryset
+        """
         queryset = Song.objects.all()
 
         artist = self.request.query_params.get('artist')
@@ -195,11 +203,19 @@ class SongViewSet(viewsets.ModelViewSet):
 
 
 class StatisticsViewSet(viewsets.ModelViewSet):
+    """
+    Generates a view for retrieving information about popularity of a specific artist.
+    """
     queryset = Song.objects.all()
     serializer_class = SongSerializer
     renderer_classes = [JSONRenderer, CSVRenderer]
 
     def list(self, request, *args, **kwargs):
+        """
+        Calculates mean, median and standard deviation of songs' hotttnesss for the specified artist
+        :param request: GET request.
+        :return: Response containing statistics and a link with a request to obtain information about the artist.
+        """
         queryset = self.get_queryset()
         statistics = dict()
 
@@ -213,6 +229,10 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         return Response(statistics)
 
     def get_queryset(self):
+        """
+        Returns a queryset with all songs of the specified artist, optionally filtered by year.
+        :return: Filtered queryset.
+        """
         queryset = Song.objects.all()
 
         artist = self.request.query_params.get('artist')
