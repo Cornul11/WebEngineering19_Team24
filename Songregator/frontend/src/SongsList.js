@@ -51,6 +51,7 @@ class SongsList extends Component {
 
   render() {
     let previousButtonState = this.state.previousPageURL === null;
+    let nextButtonState = this.state.nextPageURL === null;
     return (
       <div className="customers--list">
         <h1 className="font-weight-light">Songs list</h1>
@@ -63,11 +64,15 @@ class SongsList extends Component {
             Previous
           </button>
 
-          <button className="btn btn-primary" onClick={this.nextPage}>
+          <button
+            className="btn btn-primary"
+            onClick={this.nextPage}
+            disabled={nextButtonState}
+          >
             Next
           </button>
         </div>
-        <br></br>
+        <br />
         <table className="table">
           <thead className="thead-dark" key="thead">
             <tr>
@@ -99,7 +104,11 @@ class SongsList extends Component {
             Previous
           </button>
 
-          <button className="btn btn-primary" onClick={this.nextPage}>
+          <button
+            className="btn btn-primary"
+            onClick={this.nextPage}
+            disabled={nextButtonState}
+          >
             Next
           </button>
         </div>

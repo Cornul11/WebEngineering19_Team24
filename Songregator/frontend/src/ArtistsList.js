@@ -19,6 +19,8 @@ class ArtistsList extends Component {
     this.previousPage = this.previousPage.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.togglePopup = this.togglePopup.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   componentDidMount() {
@@ -73,9 +75,28 @@ class ArtistsList extends Component {
     console.log(d);
   }
 
+  handleSubmit(event) {
+    const {
+      match: {params},
+    } = this.props;
+    if (params && params.artist_id) {
+      this.handleUpdate(params.pk);
+    } else {
+      this.handleCreate();
+    }
+
+    event.preventDefault();
+  }
+
+  handleInputChange(event) {
+    this.setState({[event.target.name]: event.target.value});
+    console.log(event.target.name, " = ", event.target.value);
+  }
+
   render() {
     let tdStyle = {width: "15%"};
     let previousButtonState = this.state.previousPageURL === null;
+    let nextButtonState = this.state.nextPageURL === null;
 
     return (
       <div>
@@ -90,7 +111,11 @@ class ArtistsList extends Component {
             Previous
           </button>
 
-          <button className="btn btn-primary" onClick={this.nextPage}>
+          <button
+            className="btn btn-primary"
+            onClick={this.nextPage}
+            disabled={nextButtonState}
+          >
             Next
           </button>
         </div>
@@ -115,7 +140,7 @@ class ArtistsList extends Component {
                     <button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={e => this.handleDelete(e, a.artist_name)}
+                      onClick={e => this.handleDelete(e, a.artist_id)}
                     >
                       {" "}
                       Delete
@@ -123,7 +148,7 @@ class ArtistsList extends Component {
                     <button
                       type="button"
                       className="btn btn-secondary btn-sm"
-                      onClick={e => this.togglePopup(a.artist_name, e)}
+                      onClick={e => this.togglePopup(a.artist_id, e)}
                     >
                       Update
                     </button>
@@ -142,13 +167,14 @@ class ArtistsList extends Component {
             Previous
           </button>
 
-          <button className="btn btn-primary" onClick={this.nextPage}>
+          <button
+            className="btn btn-primary"
+            onClick={this.nextPage}
+            disabled={nextButtonState}
+          >
             Next
           </button>
         </div>
-        {/*<Button variant="primary" onClick={handleShow}>*/}
-        {/*    Open testing popup*/}
-        {/*</Button>*/}
         <Modal
           show={this.state.showPopup}
           onHide={this.togglePopup.bind(this)}
@@ -156,26 +182,170 @@ class ArtistsList extends Component {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title id="contained-modal-title-vcenter">Edit artist?</Modal.Title>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Edit artist{" "}
+              {this.state.artists
+                .filter(artist => {
+                  return artist.artist_id === this.artistToEdit;
+                })
+                .map(a => (
+                  <p>{a.artist_name}</p>
+                ))}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {this.state.artists
               .filter(artist => {
                 // filter first for friends
-                return artist.artist_name === this.state.artistToEdit; // returns a new array
+                return artist.artist_id === this.state.artistToEdit; // returns a new array
               })
               .map(a => (
-                <p key={a.artist_id}>{a.artist_name}</p>
+                <form
+                  className="form-editartist"
+                  key={a.artist_name}
+                  onChange={this.handleInputChange}
+                  onSubmit={this.handleSubmit}
+                >
+                  <div className="form-label-group">
+                    <input
+                      type="text"
+                      id="artistName"
+                      className="form-control"
+                      placeholder="Artist Name"
+                      required=""
+                      autoFocus=""
+                      defaultValue={a.artist_name}
+                    />
+                    <label htmlFor="artistName">Artist name</label>
+                  </div>
+                  <div className="form-label-group">
+                    <input
+                      type="text"
+                      id="artistId"
+                      className="form-control"
+                      placeholder="Artist ID"
+                      required=""
+                      defaultValue={a.artist_id}
+                    />
+                    <label htmlFor="artistId">Artist ID</label>
+                  </div>
+                  <div className="form-label-group">
+                    <input
+                      type="text"
+                      id="artistTerms"
+                      className="form-control"
+                      placeholder="Artist Terms"
+                      required=""
+                      defaultValue={a.artist_terms}
+                    />
+                    <label htmlFor="artistTerms">Artist Terms</label>
+                  </div>
+
+                  <hr />
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistFamiliarity"
+                      className="form-control"
+                      placeholder="Artist familiarity"
+                      required=""
+                      defaultValue={a.artist_familiarity}
+                      onChange={null}
+                    />
+                    <label htmlFor="artistFamiliarity">Artist familiarity</label>
+                  </div>
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistHotttnesss"
+                      className="form-control"
+                      placeholder="Artist hottnesss"
+                      required=""
+                      defaultValue={a.artist_hotttnesss}
+                    />
+                    <label htmlFor="artistHotttnesss">Artist hotttnesss</label>
+                  </div>
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistLatitude"
+                      className="form-control"
+                      placeholder="Arist latitude"
+                      required=""
+                      defaultValue={a.artist_latitude}
+                    />
+                    <label htmlFor="artistLatitude">Artist latitude</label>
+                  </div>
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistLongitude"
+                      className="form-control"
+                      placeholder="Arist longitude"
+                      required=""
+                      defaultValue={a.artist_longitude}
+                    />
+                    <label htmlFor="artistLongitude">Artist longitude</label>
+                  </div>
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistLocation"
+                      className="form-control"
+                      placeholder="Arist location"
+                      required=""
+                      defaultValue={a.artist_location}
+                    />
+                    <label htmlFor="artistLocation">Artist location</label>
+                  </div>
+
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistSimilar"
+                      className="form-control"
+                      placeholder="Artist similar"
+                      required=""
+                      defaultValue={a.artist_similar}
+                    />
+                    <label htmlFor="artistSimilar">Artist similar</label>
+                  </div>
+                  <div className="form-label-group">
+                    <input
+                      type="number"
+                      id="artistTermsFreq"
+                      className="form-control"
+                      placeholder="Artist terms frequency"
+                      required=""
+                      defaultValue={a.artist_terms_freq}
+                    />
+                    <label htmlFor="artistTermsFrequency">Artist terms frequency</label>
+                  </div>
+                  <hr />
+                  <Button
+                    className="float-right"
+                    variant="primary"
+                    type="submit"
+                    onClick={this.closePopup}
+                  >
+                    Save changes
+                  </Button>
+                  <Button
+                    className="float-right"
+                    variant="secondary"
+                    onClick={this.togglePopup.bind(this)}
+                  >
+                    Close
+                  </Button>
+                </form>
               ))}
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.togglePopup.bind(this)}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={this.closePopup}>
-              Save changes
-            </Button>
-          </Modal.Footer>
+          <Modal.Footer></Modal.Footer>
         </Modal>
       </div>
     );
